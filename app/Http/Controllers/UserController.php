@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use DB;
 use App\Models\User;
+use Validator;
 
 class UserController extends Controller
 {
@@ -37,9 +38,38 @@ class UserController extends Controller
 
     public function update( Request $req, $id ){
 
-        DB::table('users')->where('id', $id)->update( $req->all() );
+        $validator = Validator::make($req->all(), [
+            'file' => 'required|mimes:png,jpg,jpeg|max:2048'
+         ]);
+   
+        if($validator->fails()) {
 
-        return $id;
+            $message = $validator->errors()->first();
+
+            return response($message, 422);
+
+        }
+   
+
+        $file = $req->file('file');
+
+        $filename = time().'_'.$file->getClientOriginalName();
+
+        $extension = $file->getClientOriginalExtension();
+
+        $file->move( 'files' , $filename);
+
+        $filepath = url('files/'.$filename);
+
+        DB::table('users')->where('id', $id)->update([
+            'birthdate' => $req->birthdate,
+            'img' => 'files/'.$filename
+        ]);
+
+        return [
+            'birthdate' => $req->birthdate,
+            'img' => 'files/'.$filename
+        ];
 
     }
 }

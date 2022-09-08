@@ -46,11 +46,10 @@
                         </div>
                         <input id="user_birthdate" type="date" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm">
                     </div>
-                    <div class="input-group input-group-sm mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text" id="inputGroup-sizing-sm">Foto Url</span>
-                        </div>
-                        <input id="user_img" type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm">
+
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input" id="user_img" lang="es">
+                        <label class="custom-file-label" for="user_img">Seleccionar Archivo</label>
                     </div>
 
                 </div>
@@ -63,6 +62,7 @@
         </div>
 
         <!-- Scripts -->
+        <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js" integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
 

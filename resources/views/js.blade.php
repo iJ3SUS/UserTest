@@ -19,24 +19,24 @@ const User = function ( { id, name, email, city, phone, company, birthdate, img 
     this.database = false
     this.loading = false
 
-    this.update = ({img, birthdate}) => new Promise((resolve, reject) => {
+    this.update = (form) => new Promise((resolve, reject) => {
 
         const that = this
 
         $.ajax({
             url: hostname + 'users/' + that.id,
-            data: {
-                img: img,
-                birthdate: birthdate
-            },
-            type:'put',
+            data: form,
+            type:'post',
+            contentType: false,
+            processData: false,
+            dataType: 'json',
             success: function (response) {
-                that.img = img
-                that.birthdate = birthdate
+                that.img = response.img
+                that.birthdate = response.birthdate
                 resolve(response)
             },
             error:function(x,xs,xt){
-                reject('No se pudo guardar el contenido')
+                reject( x.responseText ? x.responseText : 'Error interno.')
             }
         })
 
@@ -168,7 +168,24 @@ $( document ).ready( async function() {
     $('#table_users').DataTable({
         "data": dataTableData ,
 
-        "columns": [ 
+        "columns": [
+            {
+                "title": "avatar",
+                "data": "img",
+                "render": function ( data, type, row, meta ) {
+
+                    if(!row.img){
+                        row.img = 'https://via.placeholder.com/150'
+                    }
+
+                    return `
+                        <picture class="px-1">
+                            <img style="width: 80px;background-size: cover;" src="${row.img}" class="img-fluid img-thumbnail" alt="...">
+                        </picture>
+                    ` 
+                }
+
+            },
             {
                 "title": "Nombre",
                 "data": "name",
@@ -186,7 +203,7 @@ $( document ).ready( async function() {
                 "data": "company.name"
             },
             {
-                "title": "w",
+                "title": "opciones",
                 "data": {
                     id: "id",
                     email: "email"
@@ -230,7 +247,7 @@ $( document ).ready( async function() {
         const columnIndex = table.column( this ).index()
         const rowIndex = table.row( this ).index()
 
-        if(columnIndex == 4){
+        if(columnIndex == 5){
 
             const data =  dataTableData[ rowIndex ]
 
@@ -238,7 +255,7 @@ $( document ).ready( async function() {
             if(data.database){
 
                 $("#user_id").val(rowIndex)
-                $("#user_img").val(data.img)
+                //$("#user_img").val(data.img)
                 $("#user_birthdate").val(data.birthdate)
 
                 $("#modal-title").text(data.name)
@@ -247,14 +264,6 @@ $( document ).ready( async function() {
                     backdrop: 'static',
                     keyboard: false
                 },'show')
-
-                // data.update().then( res => {
-                //     console.log('OK')
-                //     console.log(res)
-                // }).catch( err => {
-                //     console.log('err')
-                //     console.log(err)
-                // })
 
             }else{
 
@@ -289,16 +298,30 @@ $( document ).ready( async function() {
 
         const user = dataTableData[index]
 
-        user.update({
-            img: $("#user_img").val(),
-            birthdate: $("#user_birthdate").val()
-        }).then( res => {
-            console.log(res)
+        const files = $('#user_img')[0].files;
+
+        const form = new FormData()
+
+         // Append data 
+        form.append('file',files[0])
+        form.append('birthdate',  $("#user_birthdate").val() )
+
+
+        user.update(form).then( res => {
+            $('#table_users').dataTable().fnUpdate(user,index,undefined,false)
+            $("#modal").modal('hide')
+            $('#user_img').val(null)
         }).catch( err => {
-            console.log(err)
+
+            Swal.fire(
+                'No se pudo guardar el contenido',
+                err,
+                'error'
+            )
+            $('#user_img').val(null)
         })
 
-        $("#modal").modal('hide')
+        
 
 
     })
